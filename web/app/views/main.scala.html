@@ -1,0 +1,25 @@
+@(view: String)(content: Html)(implicit request: RequestHeader)
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>InsightEdge Demo</title>
+
+        <link type="text/css" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <script src="http://maps.google.com/maps/api/js?key=AIzaSyBpCx46DR6z0z7pOAmtjLiCDFyWjdQApQM"></script>
+        <script type="text/javascript" src="@routes.Assets.at("js/gmaps.min.js")"></script>
+
+        <link type="image/x-icon" href="@routes.Assets.at("images/favicon.png")" rel="icon" />
+        <link rel="stylesheet" type="text/css" href="@routes.Assets.at(s"css/$view.css")" />
+            @helper.javascriptRouter("jsRoutes")(
+                routes.javascript.Application.index
+            )
+        <script type="text/javascript" src="@routes.Assets.at(s"js/$view.js")"></script>
+    </head>
+    <body>
+        @nav()
+        @content
+    </body>
+</html>

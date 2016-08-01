@@ -1,0 +1,27 @@
+@(message: String)(implicit request:RequestHeader)
+
+@main("geospatial") {
+
+<div class="container">
+    <div class="jumbotron">
+        <h1>InsightEdge Geospatial API</h1>
+        <p>
+            This is an interactive Geospatial API demo based on the InsightEdge.<br/>
+            Run the <code>Feeder</code> to submit Taxi clients <code>request</code> and <code>pickup</code> events.
+        </p>
+        <p>Click on the map below to submit additional request and get the dynamic price for it.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8">
+            <div id="map-well" class="well">
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div id="info-well" class="well">[Requests info here]</div>
+        </div>
+    </div>
+</div>
+
+}
