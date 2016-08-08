@@ -1,4 +1,4 @@
-package com.gigaspaces.insightedge.geodemo.feeder
+package org.insightedge.geodemo.feeder
 
 import java.io.{BufferedReader, InputStreamReader}
 import java.lang.System.currentTimeMillis
