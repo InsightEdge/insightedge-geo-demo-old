@@ -7,11 +7,11 @@ grepKill() {
     pid=`ps aux | grep -v grep | grep $2 | awk '{print $2}'`
     if [ -z $pid ]; then
         echo "$title is not running"
-        exit
+        return
     fi
     echo "Stopping $title (pid: $pid)..."
 
-    kill -SIGTERM $pid
+    kill -9 $pid
 
     TIMEOUT=60
     while ps -p $pid > /dev/null; do
