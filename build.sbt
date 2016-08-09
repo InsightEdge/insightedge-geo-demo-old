@@ -22,6 +22,10 @@ val insightedgeDependencies = Seq(
   "org.gigaspaces.insightedge" % "insightedge-scala" % "1.0.0" % "compile" exclude("javax.jms", "jms"),
   "org.apache.spark" %% "spark-streaming-kafka" % "1.6.0"
 )
+val insightedgeResolvers = Seq(
+  Resolver.mavenLocal,
+  "Openspaces Maven Repository" at "http://maven-repository.openspaces.org"
+)
 
 
 lazy val root = project.in(file(".")).aggregate(web, feeder, insightedge)
@@ -34,7 +38,6 @@ lazy val feeder = project
   .settings(libraryDependencies ++= feederDependencies)
 
 lazy val insightedge = project.in(file("insightedge-processing"))
-  .settings(resolvers += Resolver.mavenLocal)
-  .settings(resolvers += "Openspaces Maven Repository" at "http://maven-repository.openspaces.org")
+  .settings(resolvers ++= insightedgeResolvers)
   .settings(libraryDependencies ++= commonDependencies)
   .settings(libraryDependencies ++= insightedgeDependencies)
