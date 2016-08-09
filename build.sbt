@@ -2,10 +2,6 @@ name := "insightedge-geo-demo"
 version := "1.0"
 scalaVersion := "2.10.4"
 
-resolvers += Resolver.mavenLocal
-resolvers += "Openspaces Maven Repository" at "http://maven-repository.openspaces.org"
-
-
 val commonDependencies = Seq(
   "org.apache.kafka" %% "kafka" % "0.8.2.2"
     exclude("javax.jms", "jms")
@@ -38,5 +34,7 @@ lazy val feeder = project
   .settings(libraryDependencies ++= feederDependencies)
 
 lazy val insightedge = project.in(file("insightedge-processing"))
+  .settings(resolvers += Resolver.mavenLocal)
+  .settings(resolvers += "Openspaces Maven Repository" at "http://maven-repository.openspaces.org")
   .settings(libraryDependencies ++= commonDependencies)
   .settings(libraryDependencies ++= insightedgeDependencies)
