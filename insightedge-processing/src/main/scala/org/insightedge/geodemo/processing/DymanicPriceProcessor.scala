@@ -1,16 +1,20 @@
 package org.insightedge.geodemo.processing
 
+import java.util.Collections
+
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.insightedge.geodemo.common.grid.Request
+import org.insightedge.geodemo.common.kafka.RequestEvent
 import org.insightedge.spark.context.InsightEdgeConfig
 import org.insightedge.spark.implicits.all._
 import play.api.libs.json.Json
 
 object DymanicPriceProcessor {
 
-  implicit val requestReads = Json.reads[Request]
+  implicit val requestReads = Json.reads[RequestEvent]
 
   def main(args: Array[String]): Unit = {
     val ieConfig = InsightEdgeConfig("insightedge-space", Some("insightedge"), Some("127.0.0.1"))
@@ -20,7 +24,8 @@ object DymanicPriceProcessor {
     val requestsStream = initKafkaStream(ssc, "requests")
 
     requestsStream
-      .map(m => Json.parse(m).as[Request])
+      .map(m => Json.parse(m).as[RequestEvent])
+      .map(e => Request(e.id, e.time, e.latitude, e.longitude, Collections.emptyList()))
       .saveToGrid()
 
     ssc.start()

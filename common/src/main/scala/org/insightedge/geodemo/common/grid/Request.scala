@@ -1,4 +1,6 @@
-package org.insightedge.geodemo.processing
+package org.insightedge.geodemo.common.grid
+
+import java.util.{Collections, List => JavaList}
 
 import org.insightedge.scala.annotation.SpaceId
 
@@ -17,10 +19,13 @@ case class Request(
                     var latitude: Double,
 
                     @BeanProperty
-                    var longitude: Double
+                    var longitude: Double,
+
+                    @BeanProperty
+                    var nearRequestsIds: JavaList[String]
 
                   ) {
 
-  def this() = this(null, 0L, 0, 0)
+  def this() = this(null, 0L, 0, 0, Collections.emptyList())
 
 }

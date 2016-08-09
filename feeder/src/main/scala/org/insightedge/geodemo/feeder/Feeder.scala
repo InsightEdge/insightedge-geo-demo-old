@@ -6,6 +6,7 @@ import java.util.{Properties, UUID}
 
 import com.github.tototoshi.csv.CSVReader
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
+import org.insightedge.geodemo.common.kafka.{RequestEvent, PickupEvent}
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Json
 
@@ -13,10 +14,6 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration._
 
 object Feeder extends App {
-
-  case class RequestEvent(id: String, time: Long, latitude: Double, longitude: Double)
-
-  case class PickupEvent(requestId: String, time: Long)
 
   run()
 
