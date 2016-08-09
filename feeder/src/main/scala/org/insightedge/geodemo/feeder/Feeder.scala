@@ -49,7 +49,7 @@ object Feeder extends App {
     while (events.hasNext) {
       val virtualTime = virtualStartTime + (currentTimeMillis() - realStartTime) * simulationSpeedupFactor
 
-      // find requests to populate, append generated ID
+      // find requests to populate
       val requestEvents = events.nextBatch(r => r.time < virtualTime)
 
       // append current requests as future pickups, clientWaitTime later
