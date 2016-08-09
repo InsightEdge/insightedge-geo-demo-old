@@ -23,9 +23,15 @@ class BatchIterator[T](iterator: Iterator[T]) {
   }
 
   def nextBatch(condition: T => Boolean): Seq[T] = {
-    buffer.filter(condition) match {
-      case Some(t) => buffer = None; t +: readNextBatch(condition)
-      case None => Seq()
+    buffer match {
+      case Some(t) =>
+        if (condition.apply(t)) {
+          buffer = None
+          t +: readNextBatch(condition)
+        } else {
+          Seq()
+        }
+      case None => readNextBatch(condition)
     }
   }
 
