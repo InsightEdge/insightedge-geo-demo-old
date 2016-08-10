@@ -16,21 +16,21 @@ object RestEndpoint extends Controller {
 
   val fullRequestWrites = Json.writes[Request]
   val shortRequestWrites = new Writes[Request] {
-    override def writes(r: Request): JsValue = {
-      Json.obj(
-        "id" -> r.id,
-        "latitude" -> r.latitude,
-        "longitude" -> r.longitude
-      )
-    }
+    override def writes(r: Request): JsValue = Json.obj("id" -> r.id, "latitude" -> r.latitude, "longitude" -> r.longitude)
   }
   val requestListWrites = Writes.list[Request](shortRequestWrites)
 
+  /**
+    * @return all current requests, in a short format
+    */
   def allRequests = Action { implicit request =>
     val requests = grid.readMultiple[Request](new SQLQuery[Request](classOf[Request], "")).toList
     Ok(Json.toJson(requests)(requestListWrites))
   }
 
+  /**
+    * @return full information on the request with specified id
+    */
   def requestById(id: String) = Action { implicit request =>
     Option(grid.readById(classOf[Request], id)) match {
       case Some(r) => Ok(Json.toJson(r)(fullRequestWrites))
