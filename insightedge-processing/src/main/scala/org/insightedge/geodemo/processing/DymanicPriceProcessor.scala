@@ -6,8 +6,8 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.insightedge.geodemo.common.dto.RequestEvent
-import org.insightedge.geodemo.common.model.Request
+import org.insightedge.geodemo.common.kafkaMessages.RequestEvent
+import org.insightedge.geodemo.common.gridModel.Request
 import org.insightedge.spark.context.InsightEdgeConfig
 import org.insightedge.spark.implicits.all._
 import play.api.libs.json.Json
@@ -29,8 +29,8 @@ object DymanicPriceProcessor {
 
     requestsStream
       .map(m => Json.parse(m).as[RequestEvent])
+      .map(e => Request(e.id, e.time, e.latitude, e.longitude, Seq()))
       .transform(rdd => { rdd.foreach(println(_)); rdd })
-      .map(e => Request(e.id, e.time, e.latitude, e.longitude, Collections.emptyList()))
       .saveToGrid()
 
     ssc.start()

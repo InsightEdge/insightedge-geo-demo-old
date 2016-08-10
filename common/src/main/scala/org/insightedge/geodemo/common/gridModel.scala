@@ -6,7 +6,7 @@ import org.insightedge.scala.annotation._
 
 import scala.beans.BeanProperty
 
-object model {
+object gridModel {
 
   /**
     * Model object stored in the Data Grid
@@ -33,11 +33,11 @@ object model {
                       var longitude: Double,
 
                       @BeanProperty
-                      var nearRequestsIds: JavaList[String]
+                      var nearRequestsIds: Seq[String]
 
                     ) {
 
-    def this() = this(null, 0L, 0, 0, Collections.emptyList())
+    def this() = this(null, 0L, 0, 0, Seq())
 
   }
 

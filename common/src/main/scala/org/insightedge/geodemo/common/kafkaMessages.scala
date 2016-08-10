@@ -1,6 +1,6 @@
 package org.insightedge.geodemo.common
 
-object dto {
+object kafkaMessages {
 
   /**
     * Transfer object for pickup events
