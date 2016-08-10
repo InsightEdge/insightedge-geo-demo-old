@@ -7,6 +7,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.insightedge.spark.context.InsightEdgeConfig
 import org.insightedge.spark.implicits.all._
 import play.api.libs.json.Json
+import org.apache.log4j.{Level, Logger}
 
 object DymanicPriceProcessor {
 
@@ -17,10 +18,14 @@ object DymanicPriceProcessor {
     val scConfig = new SparkConf().setAppName("GeospatialDemo").setMaster("local[2]").setInsightEdgeConfig(ieConfig)
     val ssc = new StreamingContext(scConfig, Seconds(1))
 
+    val rootLogger = Logger.getRootLogger
+    rootLogger.setLevel(Level.ERROR)
+
     val requestsStream = initKafkaStream(ssc, "requests")
 
     requestsStream
       .map(m => Json.parse(m).as[Request])
+      .transform(rdd => { rdd.foreach(println(_)); rdd })
       .saveToGrid()
 
     ssc.start()
