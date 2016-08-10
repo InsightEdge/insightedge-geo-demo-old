@@ -29,6 +29,7 @@ object DymanicPriceProcessor {
 
     requestsStream
       .map(m => Json.parse(m).as[RequestEvent])
+      .transform(rdd => { rdd.foreach(println(_)); rdd })
       .map(e => Request(e.id, e.time, e.latitude, e.longitude, Collections.emptyList()))
       .saveToGrid()
 
