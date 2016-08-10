@@ -14,7 +14,7 @@
         <link type="image/x-icon" href="@routes.Assets.at("images/favicon.png")" rel="icon" />
         <link rel="stylesheet" type="text/css" href="@routes.Assets.at(s"css/$view.css")" />
             @helper.javascriptRouter("jsRoutes")(
-                routes.javascript.Application.index
+                routes.javascript.WebEndpoint.index
             )
         <script type="text/javascript" src="@routes.Assets.at(s"js/$view.js")"></script>
     </head>

@@ -1,7 +1,5 @@
 package org.insightedge.geodemo.common
 
-import java.util.{Collections, List => JavaList}
-
 import org.insightedge.scala.annotation._
 
 import scala.beans.BeanProperty

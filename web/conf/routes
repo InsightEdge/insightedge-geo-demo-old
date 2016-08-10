@@ -1,9 +1,13 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
-# ~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Home page
-GET         /                         controllers.Application.index
+GET         /                               controllers.WebEndpoint.index
+
+# REST API
+GET         /rest/1.0/requests              controllers.RestEndpoint.allRequests
+GET         /rest/1.0/requests/:requestId   controllers.RestEndpoint.requestById(requestId: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file             controllers.Assets.at(path="/public", file)
+GET         /assets/*file                    controllers.Assets.at(path="/public", file)
