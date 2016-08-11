@@ -1,5 +1,8 @@
 package org.insightedge.geodemo.common
 
+import java.util.{Collections, List => JavaList}
+
+import org.openspaces.spatial.shapes._
 import org.insightedge.scala.annotation._
 
 import scala.beans.BeanProperty
@@ -9,11 +12,10 @@ object gridModel {
   /**
     * Model object stored in the Data Grid
     *
-    * @param id              the unique id of the request
-    * @param time            the timestamp of request creation
-    * @param latitude        the latitude of request coordinates
-    * @param longitude       the longitude of request coordinates
-    * @param nearRequestsIds the list of detected nearby requests
+    * @param id              unique id of the request
+    * @param time            timestamp of request creation
+    * @param location        location of request coordinates
+    * @param nearRequestsIds list of detected nearby requests
     */
   case class Request(
 
@@ -25,17 +27,14 @@ object gridModel {
                       var time: Long,
 
                       @BeanProperty
-                      var latitude: Double,
-
-                      @BeanProperty
-                      var longitude: Double,
+                      var location: Point,
 
                       @BeanProperty
                       var nearRequestsIds: Seq[String]
 
                     ) {
 
-    def this() = this(null, 0L, 0, 0, Seq())
+    def this() = this(null, 0L, null, Seq())
 
   }
 
