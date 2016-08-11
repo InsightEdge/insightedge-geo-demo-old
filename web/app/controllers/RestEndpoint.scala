@@ -4,6 +4,7 @@ import com.j_spaces.core.client.SQLQuery
 import org.insightedge.geodemo.common.gridModel.Request
 import org.openspaces.core.GigaSpaceConfigurer
 import org.openspaces.core.space.SpaceProxyConfigurer
+import org.openspaces.spatial.shapes.Point
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc._
 
@@ -14,9 +15,12 @@ object RestEndpoint extends Controller {
     new GigaSpaceConfigurer(spaceConfigurer).create()
   }
 
+  implicit val pointWrites = new Writes[Point] {
+    override def writes(p: Point): JsValue = Json.obj("x" -> p.getX, "y" -> p.getY)
+  }
   val fullRequestWrites = Json.writes[Request]
   val shortRequestWrites = new Writes[Request] {
-    override def writes(r: Request): JsValue = Json.obj("id" -> r.id, "latitude" -> r.latitude, "longitude" -> r.longitude)
+    override def writes(r: Request): JsValue = Json.obj("id" -> r.id, "latitude" -> r.location.getX, "longitude" -> r.location.getY)
   }
   val requestListWrites = Writes.list[Request](shortRequestWrites)
 
