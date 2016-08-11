@@ -12,12 +12,12 @@ object gridModel {
   /**
     * Model object stored in the Data Grid
     *
-    * @param id              unique id of the request
-    * @param time            timestamp of request creation
-    * @param location        location of request coordinates
-    * @param nearRequestsIds list of detected nearby requests
+    * @param id              unique id of the order
+    * @param time            timestamp of order creation
+    * @param location        location of order coordinates
+    * @param nearOrderIds list of detected nearby order ids
     */
-  case class Request(
+  case class OrderRequest(
 
                       @BeanProperty
                       @SpaceId
@@ -30,7 +30,7 @@ object gridModel {
                       var location: Point,
 
                       @BeanProperty
-                      var nearRequestsIds: Seq[String]
+                      var nearOrderIds: Seq[String]
 
                     ) {
 

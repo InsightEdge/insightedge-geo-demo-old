@@ -6,7 +6,7 @@ import java.util.{Properties, UUID}
 
 import com.github.tototoshi.csv.CSVReader
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
-import org.insightedge.geodemo.common.kafkaMessages.{PickupEvent, RequestEvent}
+import org.insightedge.geodemo.common.kafkaMessages.{PickupEvent, OrderEvent}
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Json
 
@@ -18,7 +18,7 @@ object Feeder extends App {
   run()
 
   def run() = {
-    // time between taxi request and pickup
+    // time between taxi order and pickup
     val clientWaitTime = 10.minutes.toMillis
     // events will be populated N times faster
     val simulationSpeedupFactor = 60
@@ -35,7 +35,7 @@ object Feeder extends App {
     if (rows.hasNext) rows.next()
 
     val events = BatchIterator(rows.map {
-      case List(date, lat, lon, _) => RequestEvent(uuid(), toTime(date), lat.toDouble, lon.toDouble)
+      case List(date, lat, lon, _) => OrderEvent(uuid(), toTime(date), lat.toDouble, lon.toDouble)
     })
 
     // get first event time
@@ -46,11 +46,11 @@ object Feeder extends App {
     while (events.hasNext) {
       val virtualTime = virtualStartTime + (currentTimeMillis() - realStartTime) * simulationSpeedupFactor
 
-      // find requests to populate
-      val requestEvents = events.nextBatch(r => r.time < virtualTime)
+      // find orders to populate
+      val orderEvents = events.nextBatch(r => r.time < virtualTime)
 
-      // append current requests as future pickups, clientWaitTime later
-      futurePickups ++= requestEvents.map(r => PickupEvent(r.id, r.time + clientWaitTime))
+      // append current orders as future pickups, clientWaitTime later
+      futurePickups ++= orderEvents.map(r => PickupEvent(r.id, r.time + clientWaitTime))
 
       // find pickups to populate
       val pickupEvents = futurePickups.filter(p => p.time < virtualTime)
@@ -59,14 +59,14 @@ object Feeder extends App {
       print(
         s"""
            |$virtualTime:
-           |  requests: ${requestEvents.size}
+           |  orders: ${orderEvents.size}
            |  pickups:  ${pickupEvents.size}
            |  current:  ${futurePickups.size}
          """.stripMargin)
 
-      implicit val locationWrites = Json.writes[RequestEvent]
+      implicit val locationWrites = Json.writes[OrderEvent]
       implicit val driverWrites = Json.writes[PickupEvent]
-      requestEvents.foreach(r => send(Json.toJson(r).toString, "requests"))
+      orderEvents.foreach(r => send(Json.toJson(r).toString, "orders"))
       pickupEvents.foreach(p => send(Json.toJson(p).toString, "pickups"))
 
       Thread.sleep(simulationRate)

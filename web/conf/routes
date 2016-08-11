@@ -6,8 +6,8 @@
 GET         /                               controllers.WebEndpoint.index
 
 # REST API
-GET         /rest/1.0/requests              controllers.RestEndpoint.allRequests
-GET         /rest/1.0/requests/:requestId   controllers.RestEndpoint.requestById(requestId: String)
+GET         /rest/1.0/orders              controllers.RestEndpoint.allOrders
+GET         /rest/1.0/orders/:orderId   controllers.RestEndpoint.orderById(orderId: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                    controllers.Assets.at(path="/public", file)

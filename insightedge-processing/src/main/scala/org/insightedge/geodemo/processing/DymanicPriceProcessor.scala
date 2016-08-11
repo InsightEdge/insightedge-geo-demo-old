@@ -6,8 +6,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.insightedge.geodemo.common.gridModel.Request
-import org.insightedge.geodemo.common.kafkaMessages.RequestEvent
+import org.insightedge.geodemo.common.gridModel.OrderRequest
+import org.insightedge.geodemo.common.kafkaMessages.OrderEvent
 import org.insightedge.spark.context.InsightEdgeConfig
 import org.insightedge.spark.implicits.all._
 import org.openspaces.spatial.ShapeFactory._
@@ -16,7 +16,7 @@ import org.apache.log4j.{Level, Logger}
 
 object DymanicPriceProcessor {
 
-  implicit val requestReads = Json.reads[RequestEvent]
+  implicit val orderEventReads = Json.reads[OrderEvent]
 
   def main(args: Array[String]): Unit = {
     val ieConfig = InsightEdgeConfig("insightedge-space", Some("insightedge"), Some("127.0.0.1"))
@@ -27,19 +27,19 @@ object DymanicPriceProcessor {
     val rootLogger = Logger.getRootLogger
     rootLogger.setLevel(Level.ERROR)
 
-    val requestsStream = initKafkaStream(ssc, "requests")
+    val ordersStream = initKafkaStream(ssc, "orders")
 
     import RddExtensionImplicit._
 
-    requestsStream
-      .map(message => Json.parse(message).as[RequestEvent])
-      .map(event => Request(event.id, event.time, point(event.latitude, event.longitude), Seq()))
+    ordersStream
+      .map(message => Json.parse(message).as[OrderEvent])
+      .map(event => OrderRequest(event.id, event.time, point(event.latitude, event.longitude), Seq()))
       .transform { rdd =>
         val query = "location spatial:within ?"
         val radius = 3 * DistanceUtils.KM_TO_DEG // TODO
-        val queryParamsConstructor = (r: Request) => Seq(circle(r.location, radius))
-        val updateRequest = (r: Request, nearRequests: Seq[Request]) =>  {
-          r.copy(nearRequestsIds = nearRequests.map(_.id))
+        val queryParamsConstructor = (r: OrderRequest) => Seq(circle(r.location, radius))
+        val updateRequest = (r: OrderRequest, nearRequests: Seq[OrderRequest]) =>  {
+          r.copy(nearOrderIds = nearRequests.map(_.id))
         }
         rdd.mapWithGridQuery(query, queryParamsConstructor, updateRequest)
       }
