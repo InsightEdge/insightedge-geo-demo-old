@@ -19,6 +19,22 @@ object RddExtensionImplicit {
       InsightEdgeConfig.fromSparkConf(sparkConf)
     }
 
+    def flatMapWithGridQuery[U: ClassTag, R: ClassTag](query: String, queryParamsConstructor: T => Seq[Any], f: (T, Seq[U]) =>  Seq[R]): RDD[R] = {
+      rdd.mapPartitions { partition =>
+        val space = GridProxyFactory.getOrCreateClustered(ieConfig)
+        partition.flatMap { item =>
+          val clazz = classTag[U].runtimeClass.asInstanceOf[Class[U]]
+          val sqlQuery = new SQLQuery[U](clazz, query)
+          val queryParams = queryParamsConstructor(item)
+          sqlQuery.setParameters(queryParams.map(_.asInstanceOf[Object]): _*)
+          val readItems = space.readMultiple(sqlQuery)
+          println("readItems: ")
+          readItems.foreach(item => println("found =" +  item))
+          f(item, readItems)
+        }
+      }
+    }
+
     def mapWithGridQuery[U: ClassTag, R: ClassTag](query: String, queryParamsConstructor: T => Seq[Any], f: (T, Seq[U]) =>  R): RDD[R] = {
       rdd.mapPartitions { partition =>
         val space = GridProxyFactory.getOrCreateClustered(ieConfig)

@@ -6,8 +6,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.insightedge.geodemo.common.gridModel.OrderRequest
-import org.insightedge.geodemo.common.kafkaMessages.OrderEvent
+import org.insightedge.geodemo.common.gridModel.{NewOrder, OrderRequest, ProcessedOrder}
+import org.insightedge.geodemo.common.kafkaMessages.{OrderEvent, PickupEvent}
 import org.insightedge.spark.context.InsightEdgeConfig
 import org.insightedge.spark.implicits.all._
 import org.openspaces.spatial.ShapeFactory._
@@ -17,10 +17,11 @@ import org.apache.log4j.{Level, Logger}
 object DymanicPriceProcessor {
 
   implicit val orderEventReads = Json.reads[OrderEvent]
+  implicit val pickupEventReads = Json.reads[PickupEvent]
 
   def main(args: Array[String]): Unit = {
     val ieConfig = InsightEdgeConfig("insightedge-space", Some("insightedge"), Some("127.0.0.1"))
-    val scConfig = new SparkConf().setAppName("GeospatialDemo").setMaster("local[2]").setInsightEdgeConfig(ieConfig)
+    val scConfig = new SparkConf().setAppName("GeospatialDemo").setMaster("local[*]").setInsightEdgeConfig(ieConfig)
     val ssc = new StreamingContext(scConfig, Seconds(1))
     val sc = ssc.sparkContext
 
@@ -28,6 +29,7 @@ object DymanicPriceProcessor {
     rootLogger.setLevel(Level.ERROR)
 
     val ordersStream = initKafkaStream(ssc, "orders")
+    val pickupsStream = initKafkaStream(ssc, "pickups")
 
     import RddExtensionImplicit._
 
@@ -35,9 +37,9 @@ object DymanicPriceProcessor {
       .map(message => Json.parse(message).as[OrderEvent])
       .transform { rdd =>
         val query = "location spatial:within ?"
-        val radius = 3 * DistanceUtils.KM_TO_DEG // TODO
+        val radius = 3 * DistanceUtils.KM_TO_DEG
         val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius))
-        val createOrder = (e: OrderEvent, nearOrders: Seq[OrderRequest]) =>  {
+        val createOrder = (e: OrderEvent, nearOrders: Seq[OrderRequest]) => {
           val location = point(e.longitude, e.latitude)
           val nearOrderIds = nearOrders.map(_.id)
           val priceFactor = if (nearOrderIds.length > 3) {
@@ -45,13 +47,27 @@ object DymanicPriceProcessor {
           } else {
             100
           }
-          OrderRequest(e.id, e.time, location, priceFactor, nearOrderIds)
+          OrderRequest(e.id, e.time, location, priceFactor, nearOrderIds, NewOrder)
         }
         rdd.mapWithGridQuery(query, queryParamsConstructor, createOrder)
       }
       .transform { rdd =>
         rdd.foreach(println)
         rdd
+      }
+      .saveToGrid()
+
+
+    pickupsStream
+      .map(message => Json.parse(message).as[PickupEvent])
+      .transform { rdd =>
+        val query = "id = ?"
+        val queryParamsConstructor = (e: PickupEvent) => Seq(e.orderId)
+        val updateOrderStatus = (e: PickupEvent, orders: Seq[OrderRequest]) => {
+          // there should be only 1 order unless we receive incorrect data
+          orders.map(_.copy(status = ProcessedOrder))
+        }
+        rdd.flatMapWithGridQuery(query, queryParamsConstructor, updateOrderStatus)
       }
       .saveToGrid()
 

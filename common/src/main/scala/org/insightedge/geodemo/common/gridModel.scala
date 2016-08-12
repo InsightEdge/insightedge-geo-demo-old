@@ -9,6 +9,11 @@ import scala.beans.BeanProperty
 
 object gridModel {
 
+  sealed trait OrderStatus
+  case object NewOrder extends OrderStatus
+  case object ProcessedOrder extends OrderStatus
+
+
   /**
     * Model object stored in the Data Grid
     *
@@ -33,11 +38,14 @@ object gridModel {
                       var priceFactor: Double,
 
                       @BeanProperty
-                      var nearOrderIds: Seq[String]
+                      var nearOrderIds: Seq[String],
+
+                      @BeanProperty
+                      var status: OrderStatus
 
                     ) {
 
-    def this() = this(null, 0L, null, 0, Seq())
+    def this() = this(null, 0L, null, 0, Seq(), null)
 
   }
 
