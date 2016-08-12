@@ -32,6 +32,7 @@ object gridModel {
                       var time: Long,
 
                       @BeanProperty
+                      @SpaceSpatialIndex
                       var location: Point,
 
                       @BeanProperty
