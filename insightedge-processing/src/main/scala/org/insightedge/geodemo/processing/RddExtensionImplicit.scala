@@ -23,7 +23,7 @@ object RddExtensionImplicit {
       rdd.mapPartitions { partition =>
         val space = GridProxyFactory.getOrCreateClustered(ieConfig)
         partition.map { item =>
-          val clazz = classTag[T].runtimeClass.asInstanceOf[Class[U]]
+          val clazz = classTag[U].runtimeClass.asInstanceOf[Class[U]]
           val sqlQuery = new SQLQuery[U](clazz, query)
           val queryParams = queryParamsConstructor(item)
           sqlQuery.setParameters(queryParams.map(_.asInstanceOf[Object]): _*)

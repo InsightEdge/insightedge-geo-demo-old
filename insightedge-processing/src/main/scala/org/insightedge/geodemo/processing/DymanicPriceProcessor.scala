@@ -33,15 +33,17 @@ object DymanicPriceProcessor {
 
     ordersStream
       .map(message => Json.parse(message).as[OrderEvent])
-      .map(event => OrderRequest(event.id, event.time, point(event.latitude, event.longitude), Seq()))
       .transform { rdd =>
         val query = "location spatial:within ?"
         val radius = 3 * DistanceUtils.KM_TO_DEG // TODO
-        val queryParamsConstructor = (r: OrderRequest) => Seq(circle(r.location, radius))
-        val updateRequest = (r: OrderRequest, nearRequests: Seq[OrderRequest]) =>  {
-          r.copy(nearOrderIds = nearRequests.map(_.id))
+        val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius))
+        val createOrder = (e: OrderEvent, nearOrders: Seq[OrderRequest]) =>  {
+          val location = point(e.longitude, e.latitude)
+          val nearOrderIds = nearOrders.map(_.id)
+          val priceFactor = if (nearOrderIds.length > 3) 150 else 100
+          OrderRequest(e.id, e.time, location, priceFactor, nearOrderIds)
         }
-        rdd.mapWithGridQuery(query, queryParamsConstructor, updateRequest)
+        rdd.mapWithGridQuery(query, queryParamsConstructor, createOrder)
       }
       .transform { rdd =>
         rdd.foreach(println)

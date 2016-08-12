@@ -30,11 +30,14 @@ object gridModel {
                       var location: Point,
 
                       @BeanProperty
+                      var priceFactor: Double,
+
+                      @BeanProperty
                       var nearOrderIds: Seq[String]
 
                     ) {
 
-    def this() = this(null, 0L, null, Seq())
+    def this() = this(null, 0L, null, 0, Seq())
 
   }
 
