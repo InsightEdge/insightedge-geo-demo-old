@@ -20,7 +20,7 @@ object RestEndpoint extends Controller {
   }
   val fullOrderWrites = Json.writes[OrderRequest]
   val shortOrderWrites = new Writes[OrderRequest] {
-    override def writes(r: OrderRequest): JsValue = Json.obj("id" -> r.id, "latitude" -> r.location.getX, "longitude" -> r.location.getY)
+    override def writes(r: OrderRequest): JsValue = Json.obj("id" -> r.id, "location" -> r.location)
   }
   val ordersListWrites = Writes.list[OrderRequest](shortOrderWrites)
 

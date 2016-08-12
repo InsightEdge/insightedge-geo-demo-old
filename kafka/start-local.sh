@@ -6,8 +6,8 @@ export ZLOGS=$KAFKA_HOME/logs/zookeeper.log
 echo "Starting ZooKeeper, logs: $ZLOGS"
 nohup $KAFKA_HOME/bin/zookeeper-server-start.sh $KAFKA_HOME/config/zookeeper.properties > $ZLOGS 2>&1 &
 
-echo "Waiting 5 seconds..."
-sleep 5
+echo "Waiting 10 seconds..."
+sleep 10
 
 export KLOGS=$KAFKA_HOME/logs/kafka.log
 echo "Starting Kafka, logs: $KLOGS"

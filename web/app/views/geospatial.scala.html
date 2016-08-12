@@ -7,19 +7,69 @@
         <h1>InsightEdge Geospatial API</h1>
         <p>
             This is an interactive Geospatial API demo based on the InsightEdge.<br/>
-            Run the <code>Feeder</code> to submit Taxi clients <code>request</code> and <code>pickup</code> events.
+            Run the <code>Feeder</code> to submit Taxi clients <code>order</code> and <code>pickup</code> events.
         </p>
         <p>Click on the map below to submit additional order and get the dynamic price for it.</p>
     </div>
 
     <div class="row">
-        <div class="col-sm-8">
-            <div id="map-well" class="well">
+        <div class="col-sm-7">
+            <div id="mapWell" class="well">
                 <div id="map"></div>
             </div>
         </div>
-        <div class="col-sm-4">
-            <div id="info-well" class="well">[Requests info here]</div>
+        <div class="col-sm-5">
+            <div id="infoWell" class="well">
+                <label>Order information:</label>
+                <div class="progress" id="orderLoadingBar">
+                    <div class="progress-bar progress-bar-striped active"
+                         role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td>Order ID:</td>
+                        <td><span id="orderId">Nothing to show</span></td>
+                    </tr>
+                    <tr>
+                        <td>Order date:</td>
+                        <td><span id="orderTime">Nothing to show</span></td>
+                    </tr>
+                    <tr>
+                        <td>Latitude:</td>
+                        <td><span id="orderLatitude">Nothing to show</span></td>
+                    </tr>
+                    <tr>
+                        <td>Longitude:</td>
+                        <td><span id="orderLongitude">Nothing to show</span></td>
+                    </tr>
+                    <tr>
+                        <td>Price surge:</td>
+                        <td><span id="orderPriceSurge">Nothing to show</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <label>Map legend:</label>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <td><img class="mapLegendIcon" src="http://maps.google.com/mapfiles/ms/icons/red.png"></td>
+                        <td>Taxi order</td>
+                    </tr>
+                    <tr>
+                        <td><img class="mapLegendIcon" src="http://maps.google.com/mapfiles/ms/icons/green-dot.png">
+                        </td>
+                        <td>Selected order</td>
+                    </tr>
+                    <tr>
+                        <td><img class="mapLegendIcon" src="http://maps.google.com/mapfiles/ms/icons/yellow-dot.png">
+                        </td>
+                        <td>Previous order that affects the price of selected order</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

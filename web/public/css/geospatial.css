@@ -1,4 +1,4 @@
-#map-well {
+#mapWell {
     padding: 5px;
     height: 500px;
 }
@@ -7,6 +7,21 @@
     height: 100%;
 }
 
-#info-well {
+#infoWell {
     height: 500px;
+}
+
+#orderLoadingBar {
+    height: 5px;
+    margin-bottom: 0;
+    margin-top: -5px;
+}
+
+#orderLoadingBar div {
+    width: 100%;
+}
+
+.mapLegendIcon {
+    width: 24px;
+    height: 24px;
 }
