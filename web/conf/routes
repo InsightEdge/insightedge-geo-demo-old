@@ -8,6 +8,8 @@ GET         /                               controllers.WebEndpoint.index
 # REST API
 GET         /rest/1.0/orders                controllers.RestEndpoint.allOrders
 GET         /rest/1.0/orders/:orderId       controllers.RestEndpoint.orderById(orderId: String)
+POST        /rest/1.0/orders                controllers.RestEndpoint.createOrder
+DELETE      /rest/1.0/orders/:orderId       controllers.RestEndpoint.removeOrderById(orderId: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                   controllers.Assets.at(path="/public", file)

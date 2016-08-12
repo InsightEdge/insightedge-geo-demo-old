@@ -6,7 +6,7 @@ import java.util.{Properties, UUID}
 
 import com.github.tototoshi.csv.CSVReader
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
-import org.insightedge.geodemo.common.kafkaMessages.{PickupEvent, OrderEvent}
+import org.insightedge.geodemo.common.kafkaMessages.{OrderEvent, PickupEvent}
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json.Json
 

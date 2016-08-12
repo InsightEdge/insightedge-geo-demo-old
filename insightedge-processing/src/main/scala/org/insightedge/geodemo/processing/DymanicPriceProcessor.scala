@@ -1,8 +1,8 @@
 package org.insightedge.geodemo.processing
 
 import com.spatial4j.core.distance.DistanceUtils
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -12,7 +12,6 @@ import org.insightedge.spark.context.InsightEdgeConfig
 import org.insightedge.spark.implicits.all._
 import org.openspaces.spatial.ShapeFactory._
 import play.api.libs.json.Json
-import org.apache.log4j.{Level, Logger}
 
 object DymanicPriceProcessor {
 
@@ -43,9 +42,9 @@ object DymanicPriceProcessor {
           val location = point(e.longitude, e.latitude)
           val nearOrderIds = nearOrders.map(_.id)
           val priceFactor = if (nearOrderIds.length > 3) {
-            100 + (nearOrderIds.length - 3) * 10
+            1.0 + (nearOrderIds.length - 3) * 0.1
           } else {
-            100
+            1.0
           }
           OrderRequest(e.id, e.time, location, priceFactor, nearOrderIds, NewOrder)
         }

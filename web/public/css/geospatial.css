@@ -12,13 +12,17 @@
 }
 
 #orderLoadingBar {
-    height: 5px;
+    height: 7px;
     margin-bottom: 0;
-    margin-top: -5px;
+    margin-top: -7px;
 }
 
 #orderLoadingBar div {
     width: 100%;
+}
+
+#orderActions {
+    margin-bottom: 20px;
 }
 
 .mapLegendIcon {
