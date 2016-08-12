@@ -40,7 +40,11 @@ object DymanicPriceProcessor {
         val createOrder = (e: OrderEvent, nearOrders: Seq[OrderRequest]) =>  {
           val location = point(e.longitude, e.latitude)
           val nearOrderIds = nearOrders.map(_.id)
-          val priceFactor = if (nearOrderIds.length > 3) 150 else 100
+          val priceFactor = if (nearOrderIds.length > 3) {
+            100 + (nearOrderIds.length - 3) * 10
+          } else {
+            100
+          }
           OrderRequest(e.id, e.time, location, priceFactor, nearOrderIds)
         }
         rdd.mapWithGridQuery(query, queryParamsConstructor, createOrder)
