@@ -1,6 +1,5 @@
 package org.insightedge.geodemo.processing
 
-import com.j_spaces.core.client.SQLQuery
 import com.spatial4j.core.distance.DistanceUtils
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
