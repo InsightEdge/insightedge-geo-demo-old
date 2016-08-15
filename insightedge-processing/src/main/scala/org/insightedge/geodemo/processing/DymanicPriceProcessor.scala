@@ -1,8 +1,9 @@
 package org.insightedge.geodemo.processing
 
+import com.j_spaces.core.client.SQLQuery
 import com.spatial4j.core.distance.DistanceUtils
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -12,7 +13,6 @@ import org.insightedge.spark.context.InsightEdgeConfig
 import org.insightedge.spark.implicits.all._
 import org.openspaces.spatial.ShapeFactory._
 import play.api.libs.json.Json
-import org.apache.log4j.{Level, Logger}
 
 object DymanicPriceProcessor {
 
@@ -37,7 +37,7 @@ object DymanicPriceProcessor {
       .map(message => Json.parse(message).as[OrderEvent])
       .transform { rdd =>
         val query = "location spatial:within ? AND status = ?"
-        val radius = 3 * DistanceUtils.KM_TO_DEG
+        val radius = 0.5 * DistanceUtils.KM_TO_DEG
         val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius), NewOrder)
         rdd.mapWithGridQuery[OrderRequest](query, queryParamsConstructor)
       }

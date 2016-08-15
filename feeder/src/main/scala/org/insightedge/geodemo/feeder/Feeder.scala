@@ -19,9 +19,9 @@ object Feeder extends App {
 
   def run() = {
     // time between taxi order and pickup
-    val clientWaitTime = 10.minutes.toMillis
+    val clientWaitTime = 10 * 10.minutes.toMillis
     // events will be populated N times faster
-    val simulationSpeedupFactor = 60
+    val simulationSpeedupFactor = 10 * 60
     // update interval for the simulation loop
     val simulationRate = 1.second.toMillis
     // simulation start

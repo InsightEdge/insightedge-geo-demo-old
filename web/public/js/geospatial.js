@@ -1,13 +1,14 @@
 $(function () {
-    hideDetailsLoading();
-
     $.geodemo = {};
+    $.geodemo.refreshRate = 2000;
+    $.geodemo.circleRadius = 500; // meters
     $.geodemo.markers = {};
     $.geodemo.nearestOrders = {};
     $.geodemo.map = initMap();
+    $.geodemo.circle = initCircle();
+    $.geodemo.selectedMarker = "";
+    $.geodemo.info = initInfo();
     refreshMap();
-
-    $("#orderActionDeselect").click(function(){hideDetails();});
 });
 
 function initMap() {
@@ -19,8 +20,28 @@ function initMap() {
         submitOrder(e.latLng.lat(), e.latLng.lng());
       },
     });
-    map.setZoom(12);
+    map.setZoom(14);
     return map;
+}
+
+function initCircle() {
+    return $.geodemo.map.drawCircle({
+        lat: 0,
+        lng: 0,
+        radius: $.geodemo.circleRadius,
+        fillColor: "#00ff00",
+        fillOpacity: 0.2,
+        strokeWeight: 0,
+        clickable: false,
+        visible: false
+    });
+}
+
+function initInfo() {
+    return new google.maps.InfoWindow({
+        content: "",
+        fillOpacity: 0.5
+    });
 }
 
 function refreshMap() {
@@ -34,165 +55,140 @@ function refreshMap() {
 
         $.each(currentOrders, function(id, value) {
           if (id in $.geodemo.markers) {
-            // skip the marker, it already exists
-          } else if("newOrderId" in $.geodemo && id == $.geodemo.newOrderId) {
             // redefine marker if it was submitted by user
-            var marker = $.geodemo.newOrderMarker;
-            delete $.geodemo.newOrderMarker;
-            delete $.geodemo.newOrderId;
-
-            marker.setTitle("Taxi Order (click for details)");
-            google.maps.event.addListener(marker, 'click', function () {
-               showDetails(id);
-            });
-
-            $.geodemo.markers[id] = marker;
-            showDetails(id);
+            var marker = $.geodemo.markers[id];
+            if (marker.state == "new") marker.setState("normal");
           } else {
             // create new marker
-            var markerData = {
-              lat: value.location.y,
-              lng: value.location.x,
-              title: "Taxi Order (click for details)",
-              icon: "http://maps.google.com/mapfiles/ms/icons/red.png",
-              animation: google.maps.Animation.DROP,
-              click: function(e) {
-                showDetails(value.id);
-              }
-            };
-            $.geodemo.markers[id] = map.addMarker(markerData);
+            createMarker(id, "normal", value.location.y, value.location.x);
           }
         });
 
         // delete old markers
-        $.each($.geodemo.markers, function(id, value) {
-          if (!(id in currentOrders)) {
-            value.setMap(null);
-            delete $.geodemo.markers[id];
+        $.each($.geodemo.markers, function(id, marker) {
+          if (!(id in currentOrders) && marker.state != "new") {
+            marker.destroy();
           }
         });
 
     });
-    setTimeout(function() {refreshMap(map);}, 2000);
+    setTimeout(function() {refreshMap();}, $.geodemo.refreshRate);
+}
+
+function createMarker(id, state, lat, lng) {
+    var markerData = {
+      lat: lat,
+      lng: lng,
+      animation: google.maps.Animation.DROP
+    };
+    var marker = $.geodemo.map.addMarker(markerData);
+    marker.markerId = id;
+    marker.state = "none";
+
+    marker.setState = function(newState) {
+        var oldState = marker.state;
+        marker.state = newState;
+        if (newState == "normal") {
+            marker.setIcon("http://maps.google.com/mapfiles/ms/icons/red.png");
+        } else if (newState == "new") {
+            marker.setTitle("Placing order...");
+            marker.setIcon("http://maps.google.com/mapfiles/ms/icons/blue.png");
+            $.geodemo.selectedMarker = id;
+        } else if (newState == "selected") {
+            marker.setIcon("http://maps.google.com/mapfiles/ms/icons/green-dot.png");
+        } else if (newState == "near") {
+            marker.setIcon("http://maps.google.com/mapfiles/ms/icons/yellow-dot.png");
+        } else if (newState == "removed") {
+            marker.setTitle("Removing order...");
+            marker.setIcon("http://maps.google.com/mapfiles/ms/micons/lightblue.png");
+        }
+
+        if (newState != "new") {
+            marker.setTitle("Taxi Order (click for details)");
+            google.maps.event.clearInstanceListeners(marker);
+            google.maps.event.addListener(marker, 'click', function () {showDetails(id);});
+            if (oldState == "new" && $.geodemo.selectedMarker == id) showDetails(id);
+        }
+    }
+
+    marker.destroy = function() {
+        marker.setMap(null);
+        if ($.geodemo.circle.markerId == marker.markerId) $.geodemo.circle.setVisible(false);
+        delete $.geodemo.markers[marker.markerId];
+    }
+
+    marker.setState(state);
+    $.geodemo.markers[id] = marker;
 }
 
 function showDetails(orderId) {
     var map = $.geodemo.map;
 
-    showDetailsLoading();
-    $.geodemo.selectedId = orderId;
-    $.each($.geodemo.markers, function(id, value) {
-      if (id == orderId) value.setIcon("http://maps.google.com/mapfiles/ms/icons/green-dot.png")
-      else value.setIcon("http://maps.google.com/mapfiles/ms/icons/red.png");
+    $.each($.geodemo.markers, function(id, marker) {
+      if (id == orderId) marker.setState("selected");
+      else if (marker.state == "selected" || marker.state == "near") marker.setState("normal");
     });
-    $.geodemo.markers[orderId]
 
     var route = jsRoutes.controllers.RestEndpoint.orderById(orderId);
     $.getJSON(route.url, function(data) {
-        hideDetailsLoading();
-        $("#orderId").html(data.id);
-        $("#orderTime").html(new Date(data.time).toLocaleString());
-        $("#orderLatitude").html(data.location.y);
-        $("#orderLongitude").html(data.location.x);
-        $("#orderPriceSurge").html(surgeText(data.priceFactor, data.nearOrderIds.length));
+        showDetailsContent($.geodemo.markers[data.id], data);
 
-        var newCircle = map.drawCircle({
-            lat: data.location.y,
-            lng: data.location.x,
-            radius: 3000,
-            fillColor: "#00ff00",
-            fillOpacity: 0.2,
-            strokeWeight: 0,
-            clickable: false
-        });
-        if ("circle" in $.geodemo) {
-            $.geodemo.circle.setMap(null);
-        }
-        $.geodemo.circle = newCircle;
+        $.geodemo.circle.setCenter({lat: data.location.y, lng: data.location.x});
+        $.geodemo.circle.markerId = data.id;
+        $.geodemo.circle.setVisible(true);
 
         $.each(data.nearOrderIds, function(index, value) {
-          if (value in $.geodemo.markers) {
-            $.geodemo.markers[value].setIcon("http://maps.google.com/mapfiles/ms/icons/yellow-dot.png")
-          }
+          if (value in $.geodemo.markers) $.geodemo.markers[value].setState("near");
         });
-
-        $("#orderActionPickup").removeAttr("disabled").unbind('click').click(function() {
-            submitPickup(data.id);
-            hideDetails();
-        });
-    });
-}
-
-function hideDetails() {
-    $("#orderId").html("Nothing to show");
-    $("#orderTime").html("Nothing to show");
-    $("#orderLatitude").html("Nothing to show");
-    $("#orderLongitude").html("Nothing to show");
-    $("#orderPriceSurge").html("Nothing to show");
-    $("#orderActionPickup").attr("disabled", "disabled");
-    if ("circle" in $.geodemo) {
-        $.geodemo.circle.setMap(null);
-        delete $.geodemo.circle;
-    }
-    delete $.geodemo.selectedId;
-    $.each($.geodemo.markers, function(id, value) {
-      value.setIcon("http://maps.google.com/mapfiles/ms/icons/red.png")
     });
 }
 
 function submitOrder(latitude, longitude) {
-    var map = $.geodemo.map;
     var route = jsRoutes.controllers.RestEndpoint.createOrder();
-
-    showDetailsLoading();
-    $("#orderId").html("Loading...");
-    $("#orderTime").html("Loading...");
-    $("#orderLatitude").html("Loading...");
-    $("#orderLongitude").html("Loading...");
-    $("#orderPriceSurge").html("Loading...");
-
     $.ajax({
         url: route.url,
         type: route.type,
         data: JSON.stringify({latitude: latitude, longitude: longitude}),
         contentType: "application/json",
-        success: function(newId) {$.geodemo.newOrderId = newId;},
-        error: function() {hideDetailsLoading();}
+        success: function(newId) {createMarker(newId, "new", latitude, longitude);}
     });
-    var markerData = {
-      lat: latitude,
-      lng: longitude,
-      title: "Placing order...",
-      icon: "http://maps.google.com/mapfiles/ms/icons/blue.png",
-      animation: google.maps.Animation.DROP
-    };
-    if ("newOrderMarker" in $.geodemo) {
-      $.geodemo.newOrderMarker.setMap(null);
-    }
-    $.geodemo.newOrderMarker = map.addMarker(markerData);
 }
 
 function submitPickup(id) {
     var route = jsRoutes.controllers.RestEndpoint.removeOrderById(id);
+    hideDetailsContent();
+
+    $.geodemo.circle.setVisible(false);
+    $.each($.geodemo.markers, function(id, marker) {
+      if (marker.state == "selected" || marker.state == "near") marker.setState("normal");
+    });
+
     $.ajax({
         url: route.url,
         type: route.type,
-        success: function(data) {
-            var marker = $.geodemo.markers[id];
-            marker.setMap(null);
-            delete $.geodemo.markers[id];
-        }
+        success: function(data) {$.geodemo.markers[id].setState("removed");}
     });
 }
 
-function showDetailsLoading() {
-    $("#orderLoadingBar").show();
+function showDetailsContent(marker, data) {
+    var info = $.geodemo.info;
+    info.setContent($("#infoTemplate").html());
+    info.open($.geodemo.map, marker);
+
+    $(".orderId").html(data.id);
+    $(".orderTime").html(new Date(data.time).toLocaleString());
+    $(".orderLatitude").html(data.location.y);
+    $(".orderLongitude").html(data.location.x);
+    $(".orderPriceSurge").html(surgeText(data.priceFactor, data.nearOrderIds.length));
+
+    $(".orderActionPickup").unbind('click').click(function() {submitPickup(data.id);});
+    $.geodemo.selectedMarker = marker.markerId;
 }
-function hideDetailsLoading() {
-    $("#orderLoadingBar").hide();
+function hideDetailsContent() {
+    $.geodemo.info.close();
 }
 function surgeText(price, count) {
-    var countText = "(affected by <span class='text-primary'>" + count + "</span> previous order" + (count == 1 ? "" : "s") + ")";
-    var surgeText = "<span class='text-success'>" + Number(price).toFixed(1) + "x</span>";
+    var countText = "(affected by <code>" + count + "</code> previous order" + (count == 1 ? "" : "s") + ")";
+    var surgeText = "<code>" + Number(price).toFixed(1) + "x</code>";
     return surgeText + " " + countText;
 }
