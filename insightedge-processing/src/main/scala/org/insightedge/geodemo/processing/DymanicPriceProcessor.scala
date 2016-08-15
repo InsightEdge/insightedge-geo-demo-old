@@ -23,6 +23,7 @@ object DymanicPriceProcessor {
     val ieConfig = InsightEdgeConfig("insightedge-space", Some("insightedge"), Some("127.0.0.1"))
     val scConfig = new SparkConf().setAppName("GeospatialDemo").setMaster("local[*]").setInsightEdgeConfig(ieConfig)
     val ssc = new StreamingContext(scConfig, Seconds(1))
+    ssc.checkpoint("checkpoint")
     val sc = ssc.sparkContext
 
     val rootLogger = Logger.getRootLogger
@@ -31,15 +32,13 @@ object DymanicPriceProcessor {
     val ordersStream = initKafkaStream(ssc, "orders")
     val pickupsStream = initKafkaStream(ssc, "pickups")
 
-    import RddExtensionImplicit._
-
     ordersStream
       .map(message => Json.parse(message).as[OrderEvent])
       .transform { rdd =>
         val query = "location spatial:within ? AND status = ?"
         val radius = 3 * DistanceUtils.KM_TO_DEG
         val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius), NewOrder)
-        rdd.mapWithGridQuery[OrderRequest](query, queryParamsConstructor)
+        rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, None)
       }
       .map { case (e: OrderEvent, nearOrders: Seq[OrderRequest]) =>
         val location = point(e.longitude, e.latitude)
@@ -67,7 +66,7 @@ object DymanicPriceProcessor {
       .transform { rdd =>
         val query = "id = ?"
         val queryParamsConstructor = (e: PickupEvent) => Seq(e.orderId)
-        rdd.mapWithGridQuery[OrderRequest](query, queryParamsConstructor)
+        rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, None)
       }
       .flatMap { case (e: PickupEvent, orders: Seq[OrderRequest]) =>
         // there should be only 1 order unless we receive incorrect data
