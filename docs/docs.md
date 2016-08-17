@@ -3,7 +3,7 @@
 ## Overview
 
 In this blog post we will create a demo application that runs real-time analytics on a streaming geospatial data.
-We take a fundamental *supply and demand* economic model of price determination in a market.
+We take a fundamental **supply and demand** economic model of price determination in a market.
 
 >Demand refers to how much (quantity) of a product or service is desired by buyers.
 >The quantity demanded is the amount of a product people are willing to buy at a certain price; the relationship between price and quantity demanded is known as the demand relationship.
@@ -29,6 +29,6 @@ You may identify the following architectural questions:
 
 The following diagram illustrates the application architecture:
 
-
+![Alt architecture](img/geo-demo-arch-diagram.jpg?raw=true "architecture")
 
 
