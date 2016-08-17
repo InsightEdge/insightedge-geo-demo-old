@@ -21,7 +21,7 @@ The Uber prices are [surging](https://help.uber.com/h/19572af0-d494-4885-a1ef-1a
 
 You may identify the following architectural questions:
 - how do we handle the various events like order request event or pickup event?
-- how do we compute the price accounting the nearby requests? We need an efficient way to execute geospatial queries?
+- how do we compute the price accounting the nearby requests? We need an efficient way to execute geospatial queries.
 - how can we scale technology to run business in many cities, states or countries?
 
 
@@ -33,19 +33,19 @@ The following diagram illustrates the application architecture:
 
 Let's now see how this architecture addresses the key questions we outlined earlier:
 - with InsightEdge Geospatial API we are able to efficiently find nearby orders and, therefore, minimize the time required to compute the price.
-The efficiency comes from the ability to index order request location in the datagrid.
-- Kafka allows to handle a huge throughput of incoming raw events.
-Even if the computation layer starts processing slower(say during the peak hour), all the events will reliably buffered in Kafka. The seamless and proven integration with Spark makes it a good choice for streaming applications.
-- InsightEdge datagrid also plays a role of a serving layer handling any operational/transactional queries from web/mobile apps.
-- all the components(Kafka and InsightEdge) can scale out almost linearly;
+The efficiency comes from the ability to **index order request location** in the datagrid.
+- Kafka allows to handle a **high throughput** of incoming raw events.
+Even if the computation layer starts processing slower(say during the peak hour), all the events will be reliably buffered in Kafka. The seamless and proven integration with Spark makes it a good choice for streaming applications.
+- InsightEdge datagrid also plays a role of a serving layer **handling any operational/transactional queries** from web/mobile apps.
+- all the components(Kafka and InsightEdge) can **scale out** almost linearly;
 
 ## Building a demo application
 
 To simulate the taxi orders we took a [csv dataset](https://github.com/fivethirtyeight/uber-tlc-foil-response) with Uber pickups in New York City. The demo application consists of following components:
-- feeder application, reads the csv file and sends order request and pickup events to Kafka
+- feeder application, reads the csv file and sends order and pickup events to Kafka
 - InsightEdge processing, a Spark Streaming application that reads from Kafka, computes price and saves to datagrid
 - web app, reads orders from datagrid and visualizes them on a map
 
-
+![Alt demo screenshot](img/demo_screenshot.jpg?raw=true "demo screenshot")
 
 
