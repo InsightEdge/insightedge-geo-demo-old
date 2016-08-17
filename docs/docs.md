@@ -48,4 +48,32 @@ To simulate the taxi orders we took a [csv dataset](https://github.com/fivethirt
 
 ![Alt demo screenshot](img/demo_screenshot.jpg?raw=true "demo screenshot")
 
+## Coding processing logic with InsightEdge API
+
+Let's see how InsightEdge API used to calculate the price.
+
+```scala
+val ordersStream = initKafkaStream(ssc, "orders")
+
+ordersStream
+  .map(message => Json.parse(message).as[OrderEvent])
+  .transform { rdd =>
+    val query = "location spatial:within ? AND status = ?"
+    val radius = 0.5 * DistanceUtils.KM_TO_DEG
+    val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius), NewOrder)
+    rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, None)
+  }
+  .map { case (e: OrderEvent, nearOrders: Seq[OrderRequest]) =>
+    val location = point(e.longitude, e.latitude)
+    val nearOrderIds = nearOrders.map(_.id)
+    val priceFactor = if (nearOrderIds.length > 3) {
+      1.0 + (nearOrderIds.length - 3) * 0.1
+    } else {
+      1.0
+    }
+    OrderRequest(e.id, e.time, location, priceFactor, nearOrderIds, NewOrder)
+  }
+  .saveToGrid()
+```
+
 
