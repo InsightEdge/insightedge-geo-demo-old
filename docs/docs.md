@@ -20,7 +20,7 @@ With services like Uber the fare rates automatically increase, when the taxi dem
 The Uber prices are [surging](https://help.uber.com/h/19572af0-d494-4885-a1ef-1a0d54d0e68f) to ensure reliability and availability for those who agree to pay a bit more.
 
 You may identify the following architectural questions:
-- how do we handle the various events like order request event or pickup event?
+- how do we handle the events like order request event or pickup event?
 - how do we compute the price accounting the nearby requests? We need an efficient way to execute geospatial queries.
 - how can we scale technology to run business in many cities, states or countries?
 
@@ -36,8 +36,10 @@ Let's now see how this architecture addresses the key questions we outlined earl
 The efficiency comes from the ability to **index order request location** in the datagrid.
 - Kafka allows to handle a **high throughput** of incoming raw events.
 Even if the computation layer starts processing slower(say during the peak hour), all the events will be reliably buffered in Kafka. The seamless and proven integration with Spark makes it a good choice for streaming applications.
-- InsightEdge datagrid also plays a role of a serving layer **handling any operational/transactional queries** from web/mobile apps.
+- InsightEdge Data Grid also plays a role of a serving layer **handling any operational/transactional queries** from web/mobile apps.
 - all the components(Kafka and InsightEdge) can **scale out** almost linearly;
+- to scale to many cities, we can leverage data locality principle through a full pipeline (Kafka, Spark, Data Grid)
+partitioning by the `city` or even with a more gradular geographical grid. In this case the geospatial search query will be limited to a single Data Grid partition. We leave this enhancement out of the scope of the demo.
 
 ## Building a demo application
 
@@ -61,7 +63,8 @@ ordersStream
     val query = "location spatial:within ? AND status = ?"
     val radius = 0.5 * DistanceUtils.KM_TO_DEG
     val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius), NewOrder)
-    rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, None)
+    val projections = Some(Seq("id"))
+    rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, projections)
   }
   .map { case (e: OrderEvent, nearOrders: Seq[OrderRequest]) => // step 4
     val location = point(e.longitude, e.latitude)
@@ -76,11 +79,14 @@ ordersStream
   .saveToGrid() // step 5
 ```
 
-- step 1: initialize a stream of Kafka "orders" topic
-- step 2: parse Kafka message that is in Json format (in real-world you may want to use formats like Avro)
+- step 1: initialize a stream of Kafka `orders` topic
+- step 2: parse Kafka message that is in Json format (in real app you may want to use formats like Avro)
 - step 3: for every order we find other nonprocessed orders within 0.3 km using InsightEdge's `zipWithGridSql()` function
 - step 4: given near orders, we calculate the price with a simple linear function
 - step 5: finally we save the order details including price and near order ids into the data grid with `saveToGrid()` function
 
+The full source of the application is available on [github](https://github.com/InsightEdge/insightedge-geo-demo)
 
+## Summary
 
+TODO:

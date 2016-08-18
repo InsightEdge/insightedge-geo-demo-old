@@ -37,7 +37,8 @@ object DymanicPriceProcessor {
         val query = "location spatial:within ? AND status = ?"
         val radius = 0.5 * DistanceUtils.KM_TO_DEG
         val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius), NewOrder)
-        rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, None)
+        val projections = Some(Seq("id"))
+        rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, projections)
       }
       .map { case (e: OrderEvent, nearOrders: Seq[OrderRequest]) =>
         val location = point(e.longitude, e.latitude)
