@@ -53,17 +53,17 @@ To simulate the taxi orders we took a [csv dataset](https://github.com/fivethirt
 Let's see how InsightEdge API used to calculate the price:
 
 ```scala
-val ordersStream = initKafkaStream(ssc, "orders")
+val ordersStream = initKafkaStream(ssc, "orders") // step 1
 
 ordersStream
-  .map(message => Json.parse(message).as[OrderEvent])
-  .transform { rdd =>
+  .map(message => Json.parse(message).as[OrderEvent]) // step 2
+  .transform { rdd =>  // step 3
     val query = "location spatial:within ? AND status = ?"
     val radius = 0.5 * DistanceUtils.KM_TO_DEG
     val queryParamsConstructor = (e: OrderEvent) => Seq(circle(point(e.longitude, e.latitude), radius), NewOrder)
     rdd.zipWithGridSql[OrderRequest](query, queryParamsConstructor, None)
   }
-  .map { case (e: OrderEvent, nearOrders: Seq[OrderRequest]) =>
+  .map { case (e: OrderEvent, nearOrders: Seq[OrderRequest]) => // step 4
     val location = point(e.longitude, e.latitude)
     val nearOrderIds = nearOrders.map(_.id)
     val priceFactor = if (nearOrderIds.length > 3) {
@@ -73,7 +73,14 @@ ordersStream
     }
     OrderRequest(e.id, e.time, location, priceFactor, nearOrderIds, NewOrder)
   }
-  .saveToGrid()
+  .saveToGrid() // step 5
 ```
+
+- step 1: initialize a stream of Kafka "orders" topic
+- step 2: parse Kafka message that is in Json format (in real-world you may want to use formats like Avro)
+- step 3: for every order we find other nonprocessed orders within 0.3 km using InsightEdge's `zipWithGridSql()` function
+- step 4: given near orders, we calculate the price with a simple linear function
+- step 5: finally we save the order details including price and near order ids into the data grid with `saveToGrid()` function
+
 
 
