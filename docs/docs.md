@@ -50,7 +50,7 @@ To simulate the taxi orders we took a [csv dataset](https://github.com/fivethirt
 
 ## Coding processing logic with InsightEdge API
 
-Let's see how InsightEdge API used to calculate the price.
+Let's see how InsightEdge API used to calculate the price:
 
 ```scala
 val ordersStream = initKafkaStream(ssc, "orders")
