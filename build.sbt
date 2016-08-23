@@ -54,18 +54,9 @@ lazy val insightedgeProcessing = project.in(file("insightedge-processing"))
   .settings(libraryDependencies ++= insightEdgeLibs("provided"))
   .settings(
     assemblyMergeStrategy in assembly := {
-    case PathList("org", "apache", "spark", "unused", "UnusedStubClass.class") => MergeStrategy.first
-    case x => (assemblyMergeStrategy in assembly).value(x)
-  },
+      case PathList("org", "apache", "spark", "unused", "UnusedStubClass.class") => MergeStrategy.first
+      case x => (assemblyMergeStrategy in assembly).value(x)
+    },
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
   )
   .dependsOn(commonGridModel, commonKafkaModel)
-
-//test in assembly := {}
-
-//assemblyMergeStrategy in assembly := {
-//  case PathList("org", "apache", "spark", "unused", "UnusedStubClass.class") => MergeStrategy.first
-//  case x => (assemblyMergeStrategy in assembly).value(x)
-//}
-//
-//assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
