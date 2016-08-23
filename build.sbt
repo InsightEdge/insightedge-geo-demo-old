@@ -2,6 +2,9 @@ name := "insightedge-geo-demo"
 version := "1.0"
 scalaVersion := "2.10.4"
 
+// if you want to run from IDE with embedded Spark set to 'true'
+val runFromIde = false
+
 val testLibs = Seq(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 )
@@ -51,7 +54,7 @@ lazy val insightedgeProcessing = project.in(file("insightedge-processing"))
   .settings(libraryDependencies += "org.apache.spark" %% "spark-streaming-kafka" % "1.6.0")
   .settings(libraryDependencies ++= testLibs)
   .settings(libraryDependencies ++= jsonLibs)
-  .settings(libraryDependencies ++= insightEdgeLibs("provided"))
+  .settings(libraryDependencies ++= insightEdgeLibs(if (runFromIde) "compile" else "provided"))
   .settings(
     assemblyMergeStrategy in assembly := {
       case PathList("org", "apache", "spark", "unused", "UnusedStubClass.class") => MergeStrategy.first

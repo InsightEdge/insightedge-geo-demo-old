@@ -13,14 +13,26 @@ import org.insightedge.spark.implicits.all._
 import org.openspaces.spatial.ShapeFactory._
 import play.api.libs.json.Json
 
+/**
+  * To run from IDE:
+  *  - set 'runFromIde' to 'true' in build.sbt
+  *  - pass local[*] as a master in program arguments
+  *
+  */
 object DymanicPriceProcessor {
 
   implicit val orderEventReads = Json.reads[OrderEvent]
   implicit val pickupEventReads = Json.reads[PickupEvent]
 
   def main(args: Array[String]): Unit = {
+    if (args.length < 1) {
+      throw new IllegalArgumentException("Not enough args. Expected args: spark-master-url")
+    }
+
+    val Array(master) = args
+
     val ieConfig = InsightEdgeConfig("insightedge-space", Some("insightedge"), Some("127.0.0.1"))
-    val scConfig = new SparkConf().setAppName("GeospatialDemo").setInsightEdgeConfig(ieConfig)
+    val scConfig = new SparkConf().setAppName("GeospatialDemo").setMaster(master).setInsightEdgeConfig(ieConfig)
     val ssc = new StreamingContext(scConfig, Seconds(1))
     ssc.checkpoint("checkpoint")
     val sc = ssc.sparkContext
