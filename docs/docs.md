@@ -92,5 +92,5 @@ The full source of the application is available on [github](https://github.com/I
 In this blog post we created a demo application that processes the data stream using InsightEdge geospatial features.
 
 An alternative approach of implementing dynamic price surging can use machine learning clustering algorythms to split order requests into clusters
-and calculate if the demand within a cluster is higher than supply. This streaming application saves the cluster details in the datagrid. Then,
+and calculate if the demand within a cluster is higher than supply. This streaming application saves the cluster details in the datagrid. Then
 to find out the price we execute geospatial query on datagrid to find which the cluster the given location belongs to.
