@@ -48,6 +48,7 @@ lazy val feeder = project
   .settings(libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "1.8.0")
   .settings(libraryDependencies ++= testLibs)
   .settings(libraryDependencies ++= jsonLibs)
+  .settings(assemblyOutputPath in assembly := new File("target/feeder.jar"))
   .dependsOn(commonKafkaModel)
 
 lazy val insightedgeProcessing = project.in(file("insightedge-processing"))
@@ -60,6 +61,7 @@ lazy val insightedgeProcessing = project.in(file("insightedge-processing"))
       case PathList("org", "apache", "spark", "unused", "UnusedStubClass.class") => MergeStrategy.first
       case x => (assemblyMergeStrategy in assembly).value(x)
     },
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false),
+    assemblyOutputPath in assembly := new File("target/insightedgeProcessing.jar")
   )
   .dependsOn(commonGridModel, commonKafkaModel)
