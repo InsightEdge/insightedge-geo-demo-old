@@ -20,7 +20,7 @@ object DymanicPriceProcessor {
 
   def main(args: Array[String]): Unit = {
     val ieConfig = InsightEdgeConfig("insightedge-space", Some("insightedge"), Some("127.0.0.1"))
-    val scConfig = new SparkConf().setAppName("GeospatialDemo").setMaster("local[*]").setInsightEdgeConfig(ieConfig)
+    val scConfig = new SparkConf().setAppName("GeospatialDemo").setInsightEdgeConfig(ieConfig)
     val ssc = new StreamingContext(scConfig, Seconds(1))
     ssc.checkpoint("checkpoint")
     val sc = ssc.sparkContext

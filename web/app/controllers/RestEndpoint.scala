@@ -4,9 +4,9 @@ import java.util.{Properties, UUID}
 
 import com.j_spaces.core.client.SQLQuery
 import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
-import org.insightedge.geodemo.common.gridModel.{NewOrder, OrderStatus, OrderRequest}
+import org.insightedge.geodemo.common.gridModel.{NewOrder, OrderRequest, OrderStatus}
+import model.OrderSubmit
 import org.insightedge.geodemo.common.kafkaMessages.{OrderEvent, PickupEvent}
-import org.insightedge.geodemo.common.restMessages.OrderSubmit
 import org.openspaces.core.GigaSpaceConfigurer
 import org.openspaces.core.space.SpaceProxyConfigurer
 import org.openspaces.spatial.shapes.Point
