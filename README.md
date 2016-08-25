@@ -9,10 +9,10 @@ Geospatial API demo: Taxi dynamic price calculation
 
 3. Build fat jars `./scripts/build-jars.sh`
 
-3. Launch Feeder `java -jar target/feeder.jar`. Alternatively you can run from IDE, see `org.insightedge.geodemo.feeder.Feeder`
+4. Launch Feeder `java -jar target/feeder.jar`. Alternatively you can run from IDE, see `org.insightedge.geodemo.feeder.Feeder`
 
-4. Submit InsightEdge processing from InsightEdge directory `./bin/insightedge-submit --class org.insightedge.geodemo.processing.DymanicPriceProcessor --master spark://127.0.0.1:7077 /path/to/insightedgeProcessing.jar spark://127.0.0.1:7077`. Alternatively you can run from IDE with Embedded Spark, see `org.insightedge.geodemo.processing.DymanicPriceProcessor`.
+5. Submit InsightEdge processing from InsightEdge directory `./bin/insightedge-submit --class org.insightedge.geodemo.processing.DymanicPriceProcessor --master spark://127.0.0.1:7077 /path/to/insightedgeProcessing.jar spark://127.0.0.1:7077`. Alternatively you can run from IDE with Embedded Spark, see `org.insightedge.geodemo.processing.DymanicPriceProcessor`.
 
-5. Launch web app with `./scripts/start-web.sh`
+6. Launch web app with `./scripts/start-web.sh`
 
-6. Open `http://localhost:9000`
+7. Open `http://localhost:9000`
