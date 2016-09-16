@@ -1,4 +1,4 @@
-# Real-time analytics on a streaming geospatial data: dynamic taxi pricing
+# Real-time Spatial Analytics with InsightEdge Spark: Taxi Price Surge Use Case
 
 ## Overview
 
