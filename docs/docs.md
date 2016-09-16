@@ -35,7 +35,7 @@ Even if the computation layer starts processing slower(say during the peak hour)
 - InsightEdge Data Grid also plays a role of a serving layer **handling any operational/transactional queries** from web/mobile apps.
 - all the components(Kafka and InsightEdge) can **scale out** almost linearly;
 - to scale to many cities, we can leverage data locality principle through a full pipeline (Kafka, Spark, Data Grid)
-partitioning by the `city` or even with a more gradular geographical grid. In this case the geospatial search query will be limited to a single Data Grid partition. We leave this enhancement out of the scope of the demo.
+partitioning by the `city` or even with a more granular geographical units of scale. In this case the geospatial search query will be limited to a single Data Grid partition. We leave this enhancement out of the scope of the demo.
 
 ## Building a demo application
 
