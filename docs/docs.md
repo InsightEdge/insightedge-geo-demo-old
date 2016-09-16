@@ -7,12 +7,8 @@ In this blog post we will create a demo application that runs real-time analytic
 We take a fundamental **supply and demand** economic model of price determination in a market.
 We will compute price in real-time based on the current supply and demand.
 
-Demand refers to how much (quantity) of a product or service is desired by buyers.
-The quantity demanded is the amount of a product people are willing to buy at a certain price.
-Supply represents how much the market can offer. Price, therefore, is a reflection of supply and demand.
-
-To make our demo even more fun, we consider transportation business domain and taxi companies like Uber or Lyft in particularly.
-In taxi services the order requests and available drivers represent the supply and demand data correspondingly.
+To make our demo even more fun, we consider the transportation business domain and taxi companies like Uber or Lyft in particular.
+In taxi services, the order requests and available drivers represent the supply and demand data correspondingly.
 It is interesting that this data is bound to **geographical location** which introduces additional complexity. Comparing to business areas like
 retail, where the product demand is linked to either offline store or a well known list of warehouses, the order requests are geographically distributed.
 
