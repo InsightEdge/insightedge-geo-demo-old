@@ -7,22 +7,24 @@ Geospatial API demo: Taxi dynamic price calculation
 
 2. Set INSIGHTEDGE_HOME env variable
 
-```bash
-    export INSIGHTEDGE_HOME="path/to/insightedge"
-```
+    ```bash
+        export INSIGHTEDGE_HOME="path/to/insightedge"
+    ```
 
-3. Launch InsightEdge `$INSIGHTEDGE_HOME/sbin/insightedge.sh --mode demo`
+3. Install InsightEdge into maven repo `$INSIGHTEDGE_HOME/sbin/insightedge-maven.sh`
 
-4. Launch Kafka. Set `KAFKA_HOME` env var with `export KAFKA_HOME=<path/to/kafka>` and then run `./scripts/start-local.sh`
+4. Launch InsightEdge `$INSIGHTEDGE_HOME/sbin/insightedge.sh --mode demo`
 
-5. Build fat jars `./scripts/build-jars.sh`
+5. Launch Kafka. Set `KAFKA_HOME` env var with `export KAFKA_HOME=<path/to/kafka>` and then run `./scripts/start-local.sh`
 
-6. Launch Feeder `java -classpath target/feeder.jar org.insightedge.geodemo.feeder.infinite.Feeder > target/feeder.out 2>&1 &`. Alternatively you can run from IDE, see `org.insightedge.geodemo.feeder.Feeder`
+6. Build fat jars `./scripts/build-jars.sh`
 
-7. Submit InsightEdge processing from InsightEdge directory 
+7. Launch Feeder `java -classpath target/feeder.jar org.insightedge.geodemo.feeder.infinite.Feeder > target/feeder.out 2>&1 &`. Alternatively you can run from IDE, see `org.insightedge.geodemo.feeder.Feeder`
+
+8. Submit InsightEdge processing from InsightEdge directory 
 `$INSIGHTEDGE_HOME/bin/insightedge-submit --class org.insightedge.geodemo.processing.DymanicPriceProcessor --master spark://127.0.0.1:7077 ./target/insightedgeProcessing.jar spark://127.0.0.1:7077 > target/processing.out 2>&1 &`. 
 Alternatively you can run from IDE with Embedded Spark, see `org.insightedge.geodemo.processing.DymanicPriceProcessor`.
 
-8. Launch web app with `./scripts/start-web.sh`
+9. Launch web app with `./scripts/start-web.sh`
 
-9. Open `http://localhost:9000`
+10. Open `http://localhost:9000`
