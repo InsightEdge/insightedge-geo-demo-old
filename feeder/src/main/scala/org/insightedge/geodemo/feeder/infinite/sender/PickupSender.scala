@@ -20,7 +20,7 @@ class PickupSender(pickups: BlockingQueue[PickupEvent],
 
   private def send(pickup: PickupEvent): Unit = {
     println(s"Sending pickup - $pickup")
-//    implicit val locationWrites = Json.writes[PickupEvent]
-//    producer.send(new KeyedMessage[String, String]("pickups", Json.toJson(pickup).toString))
+    implicit val locationWrites = Json.writes[PickupEvent]
+    producer.send(new KeyedMessage[String, String]("pickups", Json.toJson(pickup).toString))
   }
 }

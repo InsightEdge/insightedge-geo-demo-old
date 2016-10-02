@@ -22,7 +22,7 @@ class OrderSender(orders: BlockingQueue[OrderEvent],
 
   private def send(order: OrderEvent): Unit = {
     println(s"Sending order - $order")
-//    implicit val locationWrites = Json.writes[OrderEvent]
-//    producer.send(new KeyedMessage[String, String]("orders", Json.toJson(order).toString))
+    implicit val locationWrites = Json.writes[OrderEvent]
+    producer.send(new KeyedMessage[String, String]("orders", Json.toJson(order).toString))
   }
 }
