@@ -35,7 +35,7 @@ object Feeder extends App {
     if (rows.hasNext) rows.next()
 
     val events = BatchIterator(rows.map {
-      case List(date, lat, lon, _) => OrderEvent(uuid(), toTime(date), lat.toDouble, lon.toDouble)
+      case List(date, lat, lon, _) => OrderEvent(Utils.uuid(), Utils.toTime(date), lat.toDouble, lon.toDouble)
     })
 
     // get first event time
@@ -45,6 +45,8 @@ object Feeder extends App {
 
     while (events.hasNext) {
       val virtualTime = virtualStartTime + (currentTimeMillis() - realStartTime) * simulationSpeedupFactor
+
+      println("virtualTime = " + virtualTime)
 
       // find orders to populate
       val orderEvents = events.nextBatch(r => r.time < virtualTime)
@@ -75,12 +77,6 @@ object Feeder extends App {
     producer.close()
   }
 
-  lazy val dateFormatter = DateTimeFormat.forPattern("MM/DD/YYYY HH:mm:ss")
-
-  def toTime(string: String): Long = dateFormatter.parseMillis(string)
-
-  def uuid(): String = UUID.randomUUID.toString
-
   // hardcoded to simplify the demo code
   lazy val kafkaConfig = {
     val props = new Properties()
@@ -91,7 +87,8 @@ object Feeder extends App {
   lazy val producer = new Producer[String, String](new ProducerConfig(kafkaConfig))
 
   def send(message: String, topic: String) = {
-    producer.send(new KeyedMessage[String, String](topic, message))
+    println(topic + " -> " + message)
+    //producer.send(new KeyedMessage[String, String](topic, message))
   }
 
 }
