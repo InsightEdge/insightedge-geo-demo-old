@@ -3,16 +3,26 @@ Geospatial API demo: Taxi dynamic price calculation
 
 ### Running demo on a local machine
 
-1. Launch InsightEdge `./sbin/insightedge.sh --mode demo`
+1. Get into demo folder `cd path/to/insightedge-geo-demo`
 
-2. Launch Kafka. Set `KAFKA_HOME` env var with `export KAFKA_HOME=<path/to/kafka>` and then run `./scripts/start-local.sh`
+2. Set INSIGHTEDGE_HOME env variable
 
-3. Build fat jars `./scripts/build-jars.sh`
+```bash
+    export INSIGHTEDGE_HOME="path/to/insightedge"
+```
 
-4. Launch Feeder `java -classpath target/feeder.jar org.insightedge.geodemo.feeder.infinite.Feeder`. Alternatively you can run from IDE, see `org.insightedge.geodemo.feeder.Feeder`
+3. Launch InsightEdge `$INSIGHTEDGE_HOME/sbin/insightedge.sh --mode demo`
 
-5. Submit InsightEdge processing from InsightEdge directory `./bin/insightedge-submit --class org.insightedge.geodemo.processing.DymanicPriceProcessor --master spark://127.0.0.1:7077 /path/to/insightedgeProcessing.jar spark://127.0.0.1:7077`. Alternatively you can run from IDE with Embedded Spark, see `org.insightedge.geodemo.processing.DymanicPriceProcessor`.
+4. Launch Kafka. Set `KAFKA_HOME` env var with `export KAFKA_HOME=<path/to/kafka>` and then run `./scripts/start-local.sh`
 
-6. Launch web app with `./scripts/start-web.sh`
+5. Build fat jars `./scripts/build-jars.sh`
 
-7. Open `http://localhost:9000`
+6. Launch Feeder `java -classpath target/feeder.jar org.insightedge.geodemo.feeder.infinite.Feeder > target/feeder.out 2>&1 &`. Alternatively you can run from IDE, see `org.insightedge.geodemo.feeder.Feeder`
+
+7. Submit InsightEdge processing from InsightEdge directory 
+`$INSIGHTEDGE_HOME/bin/insightedge-submit --class org.insightedge.geodemo.processing.DymanicPriceProcessor --master spark://127.0.0.1:7077 ./target/insightedgeProcessing.jar spark://127.0.0.1:7077 > target/processing.out 2>&1 &`. 
+Alternatively you can run from IDE with Embedded Spark, see `org.insightedge.geodemo.processing.DymanicPriceProcessor`.
+
+8. Launch web app with `./scripts/start-web.sh`
+
+9. Open `http://localhost:9000`
