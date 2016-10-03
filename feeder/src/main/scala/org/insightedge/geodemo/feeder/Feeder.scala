@@ -46,8 +46,6 @@ object Feeder extends App {
     while (events.hasNext) {
       val virtualTime = virtualStartTime + (currentTimeMillis() - realStartTime) * simulationSpeedupFactor
 
-      println("virtualTime = " + virtualTime)
-
       // find orders to populate
       val orderEvents = events.nextBatch(r => r.time < virtualTime)
 
@@ -88,7 +86,7 @@ object Feeder extends App {
 
   def send(message: String, topic: String) = {
     println(topic + " -> " + message)
-    //producer.send(new KeyedMessage[String, String](topic, message))
+    producer.send(new KeyedMessage[String, String](topic, message))
   }
 
 }

@@ -39,8 +39,8 @@ class BatchIterator[T](iterator: Iterator[T]) {
     val matched = ArrayBuffer.empty[T]
     while (iterator.hasNext && buffer.isEmpty) {
       iterator.next() match {
-        case n if condition.apply(n) => {println(s"condition ${n}<vt=${condition.apply(n)} "); matched += n}
-        case n => {println(s"write to buffer ${n}"); buffer = Some(n)}
+        case n if condition.apply(n) => matched += n
+        case n => buffer = Some(n)
       }
     }
     matched
