@@ -75,14 +75,7 @@ object Feeder extends App {
     producer.close()
   }
 
-  // hardcoded to simplify the demo code
-  lazy val kafkaConfig = {
-    val props = new Properties()
-    props.put("metadata.broker.list", "localhost:9092")
-    props.put("serializer.class", "kafka.serializer.StringEncoder")
-    props
-  }
-  lazy val producer = new Producer[String, String](new ProducerConfig(kafkaConfig))
+  lazy val producer = Utils.createProducer()
 
   def send(message: String, topic: String) = {
     println(topic + " -> " + message)
