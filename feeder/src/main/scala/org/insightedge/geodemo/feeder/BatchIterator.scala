@@ -22,22 +22,22 @@ class BatchIterator[T](iterator: Iterator[T]) {
     case None => iterator.next()
   }
 
-  def nextBatch(condition: T => Boolean): Seq[T] = {
+  def nextBatch(condition: T => Boolean, maxElements: Int): Seq[T] = {
     buffer match {
       case Some(t) =>
         if (condition.apply(t)) {
           buffer = None
-          t +: readNextBatch(condition)
+          t +: readNextBatch(condition, maxElements)
         } else {
           Seq()
         }
-      case None => readNextBatch(condition)
+      case None => readNextBatch(condition, maxElements)
     }
   }
 
-  private def readNextBatch(condition: T => Boolean): Seq[T] = {
+  private def readNextBatch(condition: T => Boolean, maxElements: Int): Seq[T] = {
     val matched = ArrayBuffer.empty[T]
-    while (iterator.hasNext && buffer.isEmpty) {
+    while (matched.size < maxElements && iterator.hasNext && buffer.isEmpty) {
       iterator.next() match {
         case n if condition.apply(n) => matched += n
         case n => buffer = Some(n)

@@ -26,6 +26,8 @@ object Feeder extends App {
     val simulationRate = 1.second.toMillis
     // simulation start
     val realStartTime = currentTimeMillis()
+    // max order events per single batch
+    val maxBatchSize = 20
 
     val source = new BufferedReader(new InputStreamReader(this.getClass.getClassLoader.getResourceAsStream("uber-raw-data-apr14.csv")))
     val reader = CSVReader.open(source)
@@ -47,7 +49,7 @@ object Feeder extends App {
       val virtualTime = virtualStartTime + (currentTimeMillis() - realStartTime) * simulationSpeedupFactor
 
       // find orders to populate
-      val orderEvents = events.nextBatch(r => r.time < virtualTime)
+      val orderEvents = events.nextBatch(r => r.time < virtualTime, maxBatchSize)
 
       // append current orders as future pickups, clientWaitTime later
       futurePickups ++= orderEvents.map(r => PickupEvent(r.id, r.time + clientWaitTime))
