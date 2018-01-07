@@ -25,7 +25,7 @@ You may identify the following architectural questions:
 
 The following diagram illustrates the application architecture:
 
-![Alt architecture](img/geo-demo-arch-diagram.jpg?raw=true "architecture")
+![Alt architecture](docs/img/geo-demo-arch-diagram.jpg?raw=true "architecture")
 
 Let's now see how this architecture addresses the key questions we outlined earlier:
 - with InsightEdge Geospatial API we are able to efficiently find nearby orders and, therefore, minimize the time required to compute the price.
@@ -44,7 +44,7 @@ To simulate the taxi orders we took a [csv dataset](https://github.com/fivethirt
 - InsightEdge processing, a Spark Streaming application that reads from Kafka, computes price and saves to datagrid
 - web app, reads orders from datagrid and visualizes them on a map
 
-![Alt demo screenshot](img/demo_screenshot.jpg?raw=true "demo screenshot")
+![Alt demo screenshot](docs/img/demo_screenshot.jpg?raw=true "demo screenshot")
 
 ## Coding processing logic with InsightEdge API
 
